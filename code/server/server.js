@@ -121,6 +121,27 @@ app.post("/create-payment-link", async (req, res) => {
  */
 app.get("/leaders", async (req, res) => {
   // TODO: Integrate Stripe
+
+  const sessions = await stripe.checkout.sessions.list({
+    limit: 500,
+  });
+
+  let checkoutList = sessions.data;
+  let data = [];
+  checkoutList.forEach((ele)=>{
+    var tempEmail = ele.metadata.fan_email;
+    data.push({ 
+      email : tempEmail??"",
+      name : ele.metadata.fan_name??"",
+      amount : ele.amount_total,
+    });
+  });
+
+  //return the response
+  let prepareSellerData = data;
+  console.log(data);
+  res.json(prepareSellerData);
+
 });
 
 function errorHandler(err, req, res, next) {
